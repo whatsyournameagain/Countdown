@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Weekend Countdown</title>
+<title>Kip Countdown</title>
 <style>
 :root {
 --kmar-blauw: #001c3d;
@@ -16,14 +16,13 @@ height: 100vh;
 display: flex;
 align-items: center;
 justify-content: center;
-/* Achtergrondafbeelding van Marechaussee */
-background: linear-gradient(rgba(0, 28, 61, 0.7), rgba(0, 28, 61, 0.7)), 
-url('https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=2070') no-repeat center center fixed;
+/* Hier gebruiken we de Marechaussee afbeelding die je stuurde */
+background: linear-gradient(rgba(0, 28, 61, 0.6), rgba(0, 28, 61, 0.6)), 
+url('https://i.postimg.cc/8zX0P8qM/kmar-back.png') no-repeat center center fixed;
 background-size: cover;
 color: #ffffff;
 font-family: 'Segoe UI', sans-serif;
 text-align: center;
-overflow: hidden;
 }
 
 .container {
@@ -33,58 +32,49 @@ border-radius: 15px;
 border: 3px solid var(--kmar-goud);
 box-shadow: 0 0 40px rgba(0,0,0,0.8);
 width: min(550px, 90vw);
-backdrop-filter: blur(8px);
+backdrop-filter: blur(5px);
 }
 
 h1 {
 color: var(--kmar-goud);
 text-transform: uppercase;
-letter-spacing: 1.5px;
+font-size: clamp(1.1rem, 4vw, 1.6rem);
 margin-bottom: 25px;
-font-size: clamp(1.2rem, 4vw, 1.8rem);
 }
 
 #timer {
 display: flex;
 justify-content: space-around;
-gap: 10px;
 }
 
 .unit {
-display: flex;
-flex-direction: column;
 background: rgba(255, 255, 255, 0.1);
 padding: 10px;
 border-radius: 10px;
-min-width: 70px;
+min-width: 65px;
 }
 
 .unit span {
-font-size: clamp(1.8rem, 5vw, 2.8rem);
+font-size: clamp(1.8rem, 5vw, 2.5rem);
 font-weight: 800;
-color: white;
+display: block;
 }
 
 .label {
 font-size: 0.7rem;
 text-transform: uppercase;
 color: var(--kmar-goud);
-margin-top: 5px;
 }
 
 #message {
-font-size: clamp(2rem, 6vw, 3.5rem);
+font-size: clamp(2rem, 6vw, 3rem);
 font-weight: 900;
 color: #2ecc71;
 display: none;
-text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
 animation: pulse 1.5s infinite alternate;
 }
 
-@keyframes pulse {
-from { transform: scale(1); }
-to { transform: scale(1.05); }
-}
+@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
 </style>
 </head>
 <body>
@@ -105,7 +95,7 @@ to { transform: scale(1.05); }
 <script>
 function updateCountdown() {
 const now = new Date();
-const currentDay = now.getDay(); // 0=Zon, 1=Maa, ..., 5=Vrij, 6=Zat
+const currentDay = now.getDay(); 
 const currentHour = now.getHours();
 const currentMin = now.getMinutes();
 const currentTimeInMin = (currentHour * 60) + currentMin;
@@ -114,11 +104,9 @@ const friday1630 = (16 * 60) + 30;
 const sunday1800 = (18 * 60);
 
 let isThuis = false;
-
-// Logica voor 'Thuis' status
-if (currentDay === 5 && currentTimeInMin >= friday1630) isThuis = true; // Vrijdagavond
-else if (currentDay === 6) isThuis = true; // Zaterdag
-else if (currentDay === 0 && currentTimeInMin < sunday1800) isThuis = true; // Zondag voor 18:00
+if (currentDay === 5 && currentTimeInMin >= friday1630) isThuis = true;
+else if (currentDay === 6) isThuis = true;
+else if (currentDay === 0 && currentTimeInMin < sunday1800) isThuis = true;
 
 if (isThuis) {
 document.getElementById('countdown-ui').style.display = 'none';
@@ -127,35 +115,22 @@ document.getElementById('message').style.display = 'block';
 document.getElementById('countdown-ui').style.display = 'block';
 document.getElementById('message').style.display = 'none';
 
-// Bereken volgende vrijdag 16:30
 let target = new Date();
 let daysToFriday = (5 - currentDay + 7) % 7;
-
-// Als het na vrijdag 16:30 is (vandaag), mik dan op volgende week
-if (daysToFriday === 0 && currentTimeInMin >= friday1630) {
-daysToFriday = 7;
-}
+if (daysToFriday === 0 && currentTimeInMin >= friday1630) daysToFriday = 7;
 
 target.setDate(now.getDate() + daysToFriday);
 target.setHours(16, 30, 0, 0);
 
 const diff = target - now;
-
-const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-document.getElementById('days').innerText = d.toString().padStart(2, '0');
-document.getElementById('hours').innerText = h.toString().padStart(2, '0');
-document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
-document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
+document.getElementById('days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
+document.getElementById('hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
+document.getElementById('minutes').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+document.getElementById('seconds').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
 }
 }
-
 setInterval(updateCountdown, 1000);
 updateCountdown();
 </script>
-
 </body>
 </html>
