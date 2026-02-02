@@ -6,9 +6,8 @@
 <title>Weekend Countdown</title>
 <style>
 :root {
---kmar-blauw: #001c3d; /* Koninklijke Marechaussee Blauw */
+--kmar-blauw: #001c3d;
 --kmar-goud: #c5a059;
---accent: #ffffff;
 }
 
 body {
@@ -17,63 +16,74 @@ height: 100vh;
 display: flex;
 align-items: center;
 justify-content: center;
-background-color: var(--kmar-blauw);
-/* Subtiele Marechaussee-achtige achtergrond met strepen */
-background-image: repeating-linear-gradient(45deg, #001630 0px, #001630 2px, transparent 2px, transparent 10px);
-color: var(--accent);
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* Achtergrondafbeelding van Marechaussee */
+background: linear-gradient(rgba(0, 28, 61, 0.7), rgba(0, 28, 61, 0.7)), 
+url('https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=2070') no-repeat center center fixed;
+background-size: cover;
+color: #ffffff;
+font-family: 'Segoe UI', sans-serif;
 text-align: center;
+overflow: hidden;
 }
 
 .container {
-background: rgba(255, 255, 255, 0.05);
-padding: 40px;
-border-radius: 20px;
-border: 2px solid var(--kmar-goud);
-box-shadow: 0 0 30px rgba(0,0,0,0.5);
-width: min(500px, 90vw);
+background: rgba(0, 28, 61, 0.85);
+padding: 30px;
+border-radius: 15px;
+border: 3px solid var(--kmar-goud);
+box-shadow: 0 0 40px rgba(0,0,0,0.8);
+width: min(550px, 90vw);
+backdrop-filter: blur(8px);
 }
 
 h1 {
 color: var(--kmar-goud);
 text-transform: uppercase;
-letter-spacing: 2px;
-margin-bottom: 30px;
-font-size: 1.5rem;
+letter-spacing: 1.5px;
+margin-bottom: 25px;
+font-size: clamp(1.2rem, 4vw, 1.8rem);
 }
 
 #timer {
-font-size: 3rem;
-font-weight: bold;
 display: flex;
-justify-content: center;
-gap: 15px;
+justify-content: space-around;
+gap: 10px;
 }
 
 .unit {
 display: flex;
 flex-direction: column;
-font-size: 0.8rem;
-text-transform: uppercase;
-color: var(--kmar-goud);
+background: rgba(255, 255, 255, 0.1);
+padding: 10px;
+border-radius: 10px;
+min-width: 70px;
 }
 
 .unit span {
-font-size: 3rem;
+font-size: clamp(1.8rem, 5vw, 2.8rem);
+font-weight: 800;
 color: white;
 }
 
-#message {
-font-size: 2.5rem;
-font-weight: bold;
-color: #4CAF50; /* Groen voor positief nieuws */
-display: none;
-animation: bounce 1s infinite alternate;
+.label {
+font-size: 0.7rem;
+text-transform: uppercase;
+color: var(--kmar-goud);
+margin-top: 5px;
 }
 
-@keyframes bounce {
-from { transform: translateY(0); }
-to { transform: translateY(-10px); }
+#message {
+font-size: clamp(2rem, 6vw, 3.5rem);
+font-weight: 900;
+color: #2ecc71;
+display: none;
+text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+animation: pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse {
+from { transform: scale(1); }
+to { transform: scale(1.05); }
 }
 </style>
 </head>
@@ -83,28 +93,32 @@ to { transform: translateY(-10px); }
 <div id="countdown-ui">
 <h1>Kip komt weer naar huis over</h1>
 <div id="timer">
-<div class="unit"><span id="days">00</span>Dagen</div>
-<div class="unit"><span id="hours">00</span>Uur</div>
-<div class="unit"><span id="minutes">00</span>Min</div>
-<div class="unit"><span id="seconds">00</span>Sec</div>
+<div class="unit"><span id="days">00</span><div class="label">Dagen</div></div>
+<div class="unit"><span id="hours">00</span><div class="label">Uur</div></div>
+<div class="unit"><span id="minutes">00</span><div class="label">Min</div></div>
+<div class="unit"><span id="seconds">00</span><div class="label">Sec</div></div>
 </div>
 </div>
 <div id="message">HIJ IS THUIS YEAH! 🏠</div>
 </div>
 
 <script>
-function updateTimer() {
+function updateCountdown() {
 const now = new Date();
-const currentDay = now.getDay(); // 0 = Zondag, 5 = Vrijdag
-const currentTime = now.getHours() * 100 + now.getMinutes();
+const currentDay = now.getDay(); // 0=Zon, 1=Maa, ..., 5=Vrij, 6=Zat
+const currentHour = now.getHours();
+const currentMin = now.getMinutes();
+const currentTimeInMin = (currentHour * 60) + currentMin;
 
-// Bepaal of hij thuis is
-// Thuis van Vrijdag 16:30 (1630) tot Zondag 18:00 (1800)
+const friday1630 = (16 * 60) + 30;
+const sunday1800 = (18 * 60);
+
 let isThuis = false;
 
-if (currentDay === 5 && currentTime >= 1630) isThuis = true; // Vrijdag na 16:30
-if (currentDay === 6) isThuis = true; // Zaterdag de hele dag
-if (currentDay === 0 && currentTime < 1800) isThuis = true; // Zondag voor 18:00
+// Logica voor 'Thuis' status
+if (currentDay === 5 && currentTimeInMin >= friday1630) isThuis = true; // Vrijdagavond
+else if (currentDay === 6) isThuis = true; // Zaterdag
+else if (currentDay === 0 && currentTimeInMin < sunday1800) isThuis = true; // Zondag voor 18:00
 
 if (isThuis) {
 document.getElementById('countdown-ui').style.display = 'none';
@@ -115,10 +129,14 @@ document.getElementById('message').style.display = 'none';
 
 // Bereken volgende vrijdag 16:30
 let target = new Date();
-let daysUntilFriday = (5 - currentDay + 7) % 7;
-if (daysUntilFriday === 0 && currentTime >= 1630) daysUntilFriday = 7;
+let daysToFriday = (5 - currentDay + 7) % 7;
 
-target.setDate(now.getDate() + daysUntilFriday);
+// Als het na vrijdag 16:30 is (vandaag), mik dan op volgende week
+if (daysToFriday === 0 && currentTimeInMin >= friday1630) {
+daysToFriday = 7;
+}
+
+target.setDate(now.getDate() + daysToFriday);
 target.setHours(16, 30, 0, 0);
 
 const diff = target - now;
@@ -135,8 +153,8 @@ document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
 }
 }
 
-setInterval(updateTimer, 1000);
-updateTimer();
+setInterval(updateCountdown, 1000);
+updateCountdown();
 </script>
 
 </body>
