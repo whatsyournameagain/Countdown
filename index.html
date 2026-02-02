@@ -16,9 +16,9 @@ height: 100vh;
 display: flex;
 align-items: center;
 justify-content: center;
-/* De nieuwe Marechaussee foto als achtergrond */
-background: linear-gradient(rgba(0, 28, 61, 0.6), rgba(0, 28, 61, 0.6)), 
-url('https://st4.depositphotos.com/15296130/23851/i/450/depositphotos_238510800-stock-photo-marseille-france-july-2018-backside.jpg') no-repeat center center fixed;
+/* De foto van je link is nu direct gekoppeld */
+background: linear-gradient(rgba(0, 28, 61, 0.65), rgba(0, 28, 61, 0.65)), 
+url('https://i.postimg.cc/FKmFWgQH/IMG-9016.jpg') no-repeat center center fixed;
 background-size: cover;
 color: #ffffff;
 font-family: 'Segoe UI', sans-serif;
@@ -28,9 +28,9 @@ text-align: center;
 .container {
 background: rgba(0, 28, 61, 0.85);
 padding: 30px;
-border-radius: 12px;
+border-radius: 15px;
 border: 2px solid var(--kmar-goud);
-box-shadow: 0 0 30px rgba(0,0,0,0.8);
+box-shadow: 0 0 40px rgba(0,0,0,0.8);
 width: min(500px, 92vw);
 backdrop-filter: blur(8px);
 }
@@ -40,6 +40,7 @@ color: var(--kmar-goud);
 text-transform: uppercase;
 font-size: clamp(1rem, 4.5vw, 1.5rem);
 margin-bottom: 25px;
+font-weight: 800;
 letter-spacing: 1px;
 }
 
@@ -52,29 +53,28 @@ gap: 12px;
 .unit {
 background: rgba(255, 255, 255, 0.1);
 padding: 12px 8px;
-border-radius: 8px;
+border-radius: 10px;
 min-width: 70px;
+border: 1px solid rgba(197, 160, 89, 0.3);
 }
 
 .unit span {
 font-size: clamp(1.8rem, 6vw, 2.5rem);
 font-weight: 800;
 display: block;
-line-height: 1;
 }
 
 .label {
 font-size: 0.65rem;
 text-transform: uppercase;
 color: var(--kmar-goud);
-margin-top: 6px;
 font-weight: bold;
 }
 
 #message {
-font-size: clamp(1.8rem, 7vw, 3rem);
+font-size: clamp(2rem, 8vw, 3rem);
 font-weight: 900;
-color: var(--kmar-goud);
+color: #2ecc71; /* Groen voor THUIS */
 display: none;
 text-shadow: 0 0 15px rgba(0,0,0,0.5);
 animation: bounce 1.2s infinite alternate;
@@ -106,23 +106,21 @@ const hour = now.getHours();
 const min = now.getMinutes();
 const time = (hour * 60) + min;
 
-const friEnd = (16 * 60) + 30; // Vrijdag 16:30
-const sunStart = (18 * 60); // Zondag 18:00
+// Vrijdag 16:30 tot Zondag 18:00 is hij THUIS
+const friEnd = (16 * 60) + 30; 
+const sunStart = (18 * 60); 
 
 let isThuis = false;
-if (day === 5 && time >= friEnd) isThuis = true;
-else if (day === 6) isThuis = true;
-else if (day === 0 && time < sunStart) isThuis = true;
-
-const ui = document.getElementById('countdown-ui');
-const msg = document.getElementById('message');
+if (day === 5 && time >= friEnd) isThuis = true; // Vrijdag na 16:30
+else if (day === 6) isThuis = true; // Zaterdag
+else if (day === 0 && time < sunStart) isThuis = true; // Zondag voor 18:00
 
 if (isThuis) {
-ui.style.display = 'none';
-msg.style.display = 'block';
+document.getElementById('countdown-ui').style.display = 'none';
+document.getElementById('message').style.display = 'block';
 } else {
-ui.style.display = 'block';
-msg.style.display = 'none';
+document.getElementById('countdown-ui').style.display = 'block';
+document.getElementById('message').style.display = 'none';
 
 let target = new Date();
 let daysToFri = (5 - day + 7) % 7;
