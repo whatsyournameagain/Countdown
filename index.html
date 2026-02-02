@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kip Countdown</title>
+<title>Weekend Countdown</title>
 <style>
 :root {
---kmar-blauw: #001c3d;
+--kmar-blauw: #001c3d; /* Koninklijke Marechaussee Blauw */
 --kmar-goud: #c5a059;
+--accent: #ffffff;
 }
 
 body {
@@ -16,65 +17,64 @@ height: 100vh;
 display: flex;
 align-items: center;
 justify-content: center;
-/* Hier gebruiken we de Marechaussee afbeelding die je stuurde */
-background: linear-gradient(rgba(0, 28, 61, 0.6), rgba(0, 28, 61, 0.6)), 
-url('https://i.postimg.cc/8zX0P8qM/kmar-back.png') no-repeat center center fixed;
-background-size: cover;
-color: #ffffff;
-font-family: 'Segoe UI', sans-serif;
+background-color: var(--kmar-blauw);
+/* Subtiele Marechaussee-achtige achtergrond met strepen */
+background-image: repeating-linear-gradient(45deg, #001630 0px, #001630 2px, transparent 2px, transparent 10px);
+color: var(--accent);
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 text-align: center;
 }
 
 .container {
-background: rgba(0, 28, 61, 0.85);
-padding: 30px;
-border-radius: 15px;
-border: 3px solid var(--kmar-goud);
-box-shadow: 0 0 40px rgba(0,0,0,0.8);
-width: min(550px, 90vw);
-backdrop-filter: blur(5px);
+background: rgba(255, 255, 255, 0.05);
+padding: 40px;
+border-radius: 20px;
+border: 2px solid var(--kmar-goud);
+box-shadow: 0 0 30px rgba(0,0,0,0.5);
+width: min(500px, 90vw);
 }
 
 h1 {
 color: var(--kmar-goud);
 text-transform: uppercase;
-font-size: clamp(1.1rem, 4vw, 1.6rem);
-margin-bottom: 25px;
+letter-spacing: 2px;
+margin-bottom: 30px;
+font-size: 1.5rem;
 }
 
 #timer {
+font-size: 3rem;
+font-weight: bold;
 display: flex;
-justify-content: space-around;
+justify-content: center;
+gap: 15px;
 }
 
 .unit {
-background: rgba(255, 255, 255, 0.1);
-padding: 10px;
-border-radius: 10px;
-min-width: 65px;
-}
-
-.unit span {
-font-size: clamp(1.8rem, 5vw, 2.5rem);
-font-weight: 800;
-display: block;
-}
-
-.label {
-font-size: 0.7rem;
+display: flex;
+flex-direction: column;
+font-size: 0.8rem;
 text-transform: uppercase;
 color: var(--kmar-goud);
 }
 
-#message {
-font-size: clamp(2rem, 6vw, 3rem);
-font-weight: 900;
-color: #2ecc71;
-display: none;
-animation: pulse 1.5s infinite alternate;
+.unit span {
+font-size: 3rem;
+color: white;
 }
 
-@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+#message {
+font-size: 2.5rem;
+font-weight: bold;
+color: #4CAF50; /* Groen voor positief nieuws */
+display: none;
+animation: bounce 1s infinite alternate;
+}
+
+@keyframes bounce {
+from { transform: translateY(0); }
+to { transform: translateY(-10px); }
+}
 </style>
 </head>
 <body>
@@ -83,30 +83,28 @@ animation: pulse 1.5s infinite alternate;
 <div id="countdown-ui">
 <h1>Kip komt weer naar huis over</h1>
 <div id="timer">
-<div class="unit"><span id="days">00</span><div class="label">Dagen</div></div>
-<div class="unit"><span id="hours">00</span><div class="label">Uur</div></div>
-<div class="unit"><span id="minutes">00</span><div class="label">Min</div></div>
-<div class="unit"><span id="seconds">00</span><div class="label">Sec</div></div>
+<div class="unit"><span id="days">00</span>Dagen</div>
+<div class="unit"><span id="hours">00</span>Uur</div>
+<div class="unit"><span id="minutes">00</span>Min</div>
+<div class="unit"><span id="seconds">00</span>Sec</div>
 </div>
 </div>
 <div id="message">HIJ IS THUIS YEAH! 🏠</div>
 </div>
 
 <script>
-function updateCountdown() {
+function updateTimer() {
 const now = new Date();
-const currentDay = now.getDay(); 
-const currentHour = now.getHours();
-const currentMin = now.getMinutes();
-const currentTimeInMin = (currentHour * 60) + currentMin;
+const currentDay = now.getDay(); // 0 = Zondag, 5 = Vrijdag
+const currentTime = now.getHours() * 100 + now.getMinutes();
 
-const friday1630 = (16 * 60) + 30;
-const sunday1800 = (18 * 60);
-
+// Bepaal of hij thuis is
+// Thuis van Vrijdag 16:30 (1630) tot Zondag 18:00 (1800)
 let isThuis = false;
-if (currentDay === 5 && currentTimeInMin >= friday1630) isThuis = true;
-else if (currentDay === 6) isThuis = true;
-else if (currentDay === 0 && currentTimeInMin < sunday1800) isThuis = true;
+
+if (currentDay === 5 && currentTime >= 1630) isThuis = true; // Vrijdag na 16:30
+if (currentDay === 6) isThuis = true; // Zaterdag de hele dag
+if (currentDay === 0 && currentTime < 1800) isThuis = true; // Zondag voor 18:00
 
 if (isThuis) {
 document.getElementById('countdown-ui').style.display = 'none';
@@ -115,22 +113,31 @@ document.getElementById('message').style.display = 'block';
 document.getElementById('countdown-ui').style.display = 'block';
 document.getElementById('message').style.display = 'none';
 
+// Bereken volgende vrijdag 16:30
 let target = new Date();
-let daysToFriday = (5 - currentDay + 7) % 7;
-if (daysToFriday === 0 && currentTimeInMin >= friday1630) daysToFriday = 7;
+let daysUntilFriday = (5 - currentDay + 7) % 7;
+if (daysUntilFriday === 0 && currentTime >= 1630) daysUntilFriday = 7;
 
-target.setDate(now.getDate() + daysToFriday);
+target.setDate(now.getDate() + daysUntilFriday);
 target.setHours(16, 30, 0, 0);
 
 const diff = target - now;
-document.getElementById('days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
-document.getElementById('hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
-document.getElementById('minutes').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-document.getElementById('seconds').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+
+const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+document.getElementById('days').innerText = d.toString().padStart(2, '0');
+document.getElementById('hours').innerText = h.toString().padStart(2, '0');
+document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
+document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
 }
 }
-setInterval(updateCountdown, 1000);
-updateCountdown();
+
+setInterval(updateTimer, 1000);
+updateTimer();
 </script>
+
 </body>
 </html>
